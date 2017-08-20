@@ -2,7 +2,6 @@
 # Launcher
 class Launcher
   def initialize
-    require_relative @class.capitalize
   end
   @class = ARGV[0]
   ARGV.clear
