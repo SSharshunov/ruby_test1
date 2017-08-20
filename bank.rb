@@ -1,46 +1,52 @@
 #!/usr/bin/env ruby
 require_relative 'card'
-
 # Main class of bank functionality
 class Bank
+  FLOAT_COUNT = 2
+  FEE_INDEX = 1
+  LIMIT_INDEX = 2
+  CARD_TYPES = {
+    # format ['Name of provider', 'Fee in procents', 'Max Limit of use']
+    0 => ['Visa', 5, -2000],
+    1 => ['MasterCard', 3, 0]
+  }.freeze
   attr_reader :cards
 
   def initialize
-    @card_types = %w[Visa MasterCard]
-    @cards = []
+    # @cards = []
+    @cards = {}
     @curent_card = 0
+  end
+
+  def self.card_fee(index)
+    CARD_TYPES[index][Bank::FEE_INDEX]
+  end
+
+  def self.card_limit(index)
+    CARD_TYPES[index][Bank::LIMIT_INDEX]
   end
 
   def new_card
     puts 'Выберите тип карты'
-    @card_types.each_with_index { |c, index| print "#{index} = #{c} " }
+    CARD_TYPES.each do |key, value|
+      print "#{key} = #{value[0]} (#{value[1]}%) "
+    end
     puts "\n"
-    user_card_type = gets.to_i
-    @curent_card = Card.new(user_card_type)
-    @cards.push(@curent_card)
-    puts "На данный момент открыто #{@cards.count} карт(ы)\n"
+    @curent_card = Card.new(gets.to_i)
+    # @cards.push(@curent_card)
+    @cards[@curent_card.id] = @curent_card
   end
 
   def print_balance
-    puts "$#{@cards[find_card_by_id].balance}."
+    puts "#{find_card_by_id.balance}$"
   end
 
   def fund
-    loop do
-      puts 'Введите сумму'
-      @sum = gets.chomp
-      break unless @sum.empty?
-    end
-    @cards[find_card_by_id].add_funds(@sum.to_i)
+    find_card_by_id.add_funds(input_sum)
   end
 
   def pay
-    loop do
-      puts 'Введите сумму'
-      @sum = gets.chomp
-      break unless @sum.empty?
-    end
-    @cards[find_card_by_id].pay(@sum.to_i)
+    find_card_by_id.pay(input_sum)
   end
 
   def help
@@ -55,20 +61,29 @@ class Bank
 
   def print_all_cards
     puts "На данный момент открыто #{@cards.count} карт(ы)\n"
-    @cards.each { |a| puts "#{a.id} - $#{a.balance}.\n" }
+    @cards.each_with_index do |a, index|
+      puts "#{index} - #{a[1].balance.round(Bank::FLOAT_COUNT)}$ \
+           - #{CARD_TYPES[a[1].user_card_type][0]}\n"
+    end
   end
 
   def find_card_by_id
     loop do
-      @card_number = -1
       puts 'Введите номер карты'
       @card_id = gets.chomp
-      @cards.each_with_index do |c, index|
-        @card_number = index if c.id == @card_id
-      end
-      break if @card_number != -1
+      @cards[@card_id]
+      break if @cards.key?(@card_id) # @card_number != -1
     end
-    @card_number
+    @cards[@card_id]
+  end
+
+  def input_sum
+    loop do
+      puts 'Введите сумму'
+      @sum = gets.chomp
+      break unless @sum.empty?
+    end
+    @sum.to_f.round(Bank::FLOAT_COUNT)
   end
 end
 

@@ -1,21 +1,24 @@
 # Class of cards functionality
 class Card
-  attr_reader :balance, :id
-  def initialize(userCardType = 0)
-    @id = (0...8).map { (65 + rand(26)).chr }.join
-    @user_card_type = userCardType
-    @balance = 0
+  MAX_RANDOM = 26
+  SALT_RANDOM = 65
+  START_BALANCE = 0.00
+  attr_reader :balance, :id, :user_card_type
+  def initialize(user_card_type = 0)
+    @id = (0...8).map { (Card::SALT_RANDOM + rand(Card::MAX_RANDOM)).chr }.join
+    @user_card_type = user_card_type
+    @balance = Card::START_BALANCE
     puts "Номер карты \"#{id}\""
   end
 
   def add_funds(sum)
-    @balance += sum
+    @balance += sum.to_f
   end
 
   def pay(sum)
     start_balance = @balance
-    @user_card_type.zero? ? (sum = sum * 0.05 + sum) : (sum = sum * 0.03 + sum)
-    @user_card_type.zero? ? (over_balance = -2000) : (over_balance = 0)
+    sum += sum * Bank.card_fee(@user_card_type) / 100
+    over_balance = Bank.card_limit(@user_card_type)
     @balance -= sum if @balance - sum >= over_balance
     puts "У вас списано #{@balance - start_balance}"
     puts 'Недостаточно средств' if start_balance == @balance
