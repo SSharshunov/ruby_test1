@@ -32,9 +32,7 @@ class Bank
       print "#{key} = #{value[0]} (#{value[1]}%) "
     end
     puts "\n"
-    @curent_card = Card.new(gets.to_i)
-    # @cards.push(@curent_card)
-    @cards[@curent_card.id] = @curent_card
+    @cards[@curent_card.id] = Card.new(gets.to_i)
   end
 
   def print_balance
