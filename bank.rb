@@ -13,7 +13,6 @@ class Bank
   attr_reader :cards
 
   def initialize
-    # @cards = []
     @cards = {}
     @curent_card = 0
   end
@@ -24,6 +23,16 @@ class Bank
 
   def self.card_limit(index)
     CARD_TYPES[index][Bank::LIMIT_INDEX]
+  end
+
+  def self.helper
+    @methods = {
+      0 => ['Открытие новой карты', 'new_card'],
+      1 => ['Узнать баланс', 'print_balance'],
+      2 => ['Вывести все карты', 'print_all_cards'],
+      3 => ['Пополнить баланс', 'fund'],
+      4 => ['Оплатить с карты', 'pay']
+    }
   end
 
   def new_card
@@ -71,7 +80,7 @@ class Bank
       puts 'Введите номер карты'
       @card_id = gets.chomp
       @cards[@card_id]
-      break if @cards.key?(@card_id) # @card_number != -1
+      break if @cards.key?(@card_id)
     end
     @cards[@card_id]
   end
@@ -83,26 +92,5 @@ class Bank
       break unless @sum.empty?
     end
     @sum.to_f.round(Bank::FLOAT_COUNT)
-  end
-end
-
-b = Bank.new
-
-loop do
-  b.help
-  command = gets.chomp
-  case command
-  when '0'
-    puts b.new_card
-  when '1'
-    puts b.print_balance
-  when '2'
-    puts b.print_all_cards
-  when '3'
-    puts b.fund
-  when '4'
-    puts b.pay
-  else
-    puts 'Неверная команда'
   end
 end
