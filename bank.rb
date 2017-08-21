@@ -46,7 +46,7 @@ class Bank
   end
 
   def print_balance
-    puts "#{find_card_by_id.balance}$"
+    puts "#{find_card_by_id.balance.round(Bank::FLOAT_COUNT)}$"
   end
 
   def fund
